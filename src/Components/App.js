@@ -1,36 +1,50 @@
-import React from 'react'
-import store, { makeRow, changeColor } from '../store'
+import React from 'react';
+import store, { makeRow, changeColor, makeColumn } from '../store';
+import Table from './Table';
 
 export default class App extends React.Component {
   constructor(props) {
-    super(props)
-    this.state = store.getState()
-    console.log(props, 'props')
-    this.handleClick = this.handleClick.bind(this)
-    this.handlePaint = this.handlePaint.bind(this)
+    super(props);
+    this.state = store.getState();
+    this.handleClick = this.handleClick.bind(this);
+    this.handlePaint = this.handlePaint.bind(this);
   }
+
   componentDidMount() {
     this.unsubscribe = store.subscribe(() => {
-      return this.setState(store.getState())
-    })
+      return this.setState(store.getState());
+    });
   }
-  componentWillUnmount() {
-    this.unsubscribe()
-  }
-  handleClick() {
-    store.dispatch(makeRow())
 
+  componentWillUnmount() {
+    this.unsubscribe();
   }
+
+  handleClick(event) {
+    switch (event.target.id) {
+      case 'add-row':
+        store.dispatch(makeRow());
+        break;
+      case 'add-col':
+        store.dispatch(makeColumn());
+        break;
+      default:
+        break;
+    }
+  }
+
   handlePaint(event) {
-    store.dispatch(changeColor(event.target.value))
+    store.dispatch(changeColor(event.target.value));
   }
 
   render() {
     return (
-      <div id='pixelate'>
+      <div id="pixelate">
         <h1>Pixelate</h1>
         <div>
-          <button id='add-row' onClick={this.handleClick}>Add a row</button>
+          <button id="add-row" onClick={this.handleClick}>
+            Add a row
+          </button>
           <select onChange={this.handlePaint}>
             <option value="red">Red</option>
             <option value="orange">Orange</option>
@@ -43,24 +57,12 @@ export default class App extends React.Component {
             <option value="white">White</option>
             <option value="brown">Brown</option>
           </select>
+          <button id="add-col" onClick={this.handleClick}>
+            Add a Column
+          </button>
         </div>
-        <table>
-          <tbody>
-            {this.state.grid.map((elem, idx) => {
-              return (
-                <tr key={idx}>
-                  {elem.map((cell, idx) => {
-                    return (
-                      <td key={idx} className={cell}></td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <Table grid={this.state.grid} />
       </div>
-    )
-
+    );
   }
 }
